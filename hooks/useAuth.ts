@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { checkEmailAccess, signOut } from '@/lib/auth'
 import type { User } from '@supabase/supabase-js'
 
@@ -9,13 +9,28 @@ export function useAuth() {
   const [accessDenied, setAccessDenied] = useState(false)
 
   useEffect(() => {
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - skipping auth initialization')
+      setLoading(false)
+      return
+    }
+
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error)
+        setLoading(false)
+        return
+      }
       if (session?.user) {
         handleUser(session.user)
       } else {
         setLoading(false)
       }
+    }).catch((error) => {
+      console.error('Error in getSession:', error)
+      setLoading(false)
     })
 
     // Listen for auth changes
