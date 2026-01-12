@@ -1,12 +1,33 @@
 'use client'
 
+import { ErrorBoundary } from 'react-error-boundary'
 import { useAuth } from '@/hooks/useAuth'
 import { signInWithGoogle } from '@/lib/auth'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import Dashboard from '@/components/Dashboard'
 import AccessDenied from '@/components/AccessDenied'
 
-export default function Home() {
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+      <div className="text-center max-w-md px-4">
+        <h1 className="text-xl font-light text-[var(--text)] mb-4">Error</h1>
+        <p className="text-[var(--text-muted)] text-sm mb-2">
+          {error.message || 'An unexpected error occurred'}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:border-[var(--border-hover)] transition-colors text-sm mt-4"
+          style={{ borderRadius: '4px' }}
+        >
+          Reload Page
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function HomeContent() {
   const { user, loading, accessDenied } = useAuth()
   
   // Show configuration error if Supabase is not configured
@@ -56,4 +77,12 @@ export default function Home() {
   }
 
   return <Dashboard />
+}
+
+export default function Home() {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <HomeContent />
+    </ErrorBoundary>
+  )
 }
