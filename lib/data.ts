@@ -287,7 +287,7 @@ export async function getCommandStats(
   // Only counts if the selected date itself has an entry
   let streak = 0
   if (streakData && streakData.length > 0) {
-    const uniqueDates = [...new Set(streakData.map((e) => e.date))]
+    const uniqueDates = Array.from(new Set(streakData.map((e) => e.date)))
     const dateSet = new Set(uniqueDates)
     
     const selectedDateStr = date // Already in YYYY-MM-DD format
