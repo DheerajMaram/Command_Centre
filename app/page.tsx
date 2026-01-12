@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useAuth } from '@/hooks/useAuth'
 import { signInWithGoogle } from '@/lib/auth'
 import Dashboard from '@/components/Dashboard'
